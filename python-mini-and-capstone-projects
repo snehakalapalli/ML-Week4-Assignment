@@ -1,0 +1,251 @@
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import requests
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# ==========================================
+# MINI PROJECTS
+# ==========================================
+
+# 1. Contact Book App using Dictionary
+def contact_book():
+    contacts = {}
+    while True:
+        print("\n--- Contact Book ---")
+        print("1. Add/Update Contact")
+        print("2. View Contacts")
+        print("3. Search Contact")
+        print("4. Delete Contact")
+        print("5. Back to Main Menu")
+        
+        choice = input("Enter choice (1-5): ")
+        if choice == '1':
+            name = input("Enter name: ")
+            phone = input("Enter phone number: ")
+            contacts[name] = phone
+            print(f"Contact '{name}' saved successfully!")
+        elif choice == '2':
+            if not contacts:
+                print("No contacts found.")
+            else:
+                print("\nContact List:")
+                for name, phone in contacts.items():
+                    print(f"{name}: {phone}")
+        elif choice == '3':
+            name = input("Enter name to search: ")
+            if name in contacts:
+                print(f"{name}: {contacts[name]}")
+            else:
+                print("Contact not found.")
+        elif choice == '4':
+            name = input("Enter name to delete: ")
+            if name in contacts:
+                del contacts[name]
+                print(f"Contact '{name}' deleted.")
+            else:
+                print("Contact not found.")
+        elif choice == '5':
+            break
+        else:
+            print("Invalid choice.")
+
+# 2. Simple Calculator using Functions
+def add(a, b): return a + b
+def subtract(a, b): return a - b
+def multiply(a, b): return a * b
+def divide(a, b): return a / b if b != 0 else "Error! Division by zero."
+
+def calculator():
+    while True:
+        print("\n--- Simple Calculator ---")
+        print("1. Add\n2. Subtract\n3. Multiply\n4. Divide\n5. Back to Main Menu")
+        choice = input("Choose operation (1-5): ")
+        if choice == '5':
+            break
+        if choice in ('1', '2', '3', '4'):
+            try:
+                num1 = float(input("Enter first number: "))
+                num2 = float(input("Enter second number: "))
+            except ValueError:
+                print("Invalid input. Enter numbers only.")
+                continue
+            if choice == '1': print(f"Result: {add(num1, num2)}")
+            elif choice == '2': print(f"Result: {subtract(num1, num2)}")
+            elif choice == '3': print(f"Result: {multiply(num1, num2)}")
+            elif choice == '4': print(f"Result: {divide(num1, num2)}")
+        else:
+            print("Invalid choice.")
+
+# 3. Automate Email Sending with smtplib
+def send_single_email():
+    print("\n--- Email Automation ---")
+    sender_email = input("Enter sender email: ")
+    sender_password = input("Enter app password: ")
+    receiver_email = input("Enter receiver email: ")
+    subject = input("Enter subject: ")
+    body = input("Enter message body: ")
+
+    try:
+        msg = MIMEMultipart()
+        msg["From"] = sender_email
+        msg["To"] = receiver_email
+        msg["Subject"] = subject
+        msg.attach(MIMEText(body, "plain"))
+
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        server.sendmail(sender_email, receiver_email, msg.as_string())
+        server.quit()
+        print("Email sent successfully!")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+
+# 4. Weather App using OpenWeather API
+def weather_app():
+    print("\n--- Weather App ---")
+    city_name = input("Enter city name: ")
+    api_key = input("Enter OpenWeather API key: ")
+    
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={city_name}&appid={api_key}&units=metric"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        print(f"\nCity: {city_name}")
+        print(f"Temperature: {data['main']['temp']}°C")
+        print(f"Weather: {data['weather'][0]['description'].capitalize()}")
+        print(f"Humidity: {data['main']['humidity']}%")
+    else:
+        print("City not found or invalid API key.")
+
+# 5. Live Cryptocurrency Prices Fetcher
+def crypto_tracker():
+    print("\n--- Live Crypto Prices ---")
+    url = "https://api.coingecko.com/api/v3/simple/price"
+    params = {"ids": "bitcoin,ethereum,dogecoin", "vs_currencies": "usd,inr"}
+    
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+        data = response.json()
+        for coin, prices in data.items():
+            print(f"{coin.capitalize()}: USD ${prices['usd']} | INR ₹{prices['inr']}")
+    else:
+        print("Failed to fetch crypto data.")
+
+
+# ==========================================
+# CAPSTONE PROJECTS
+# ==========================================
+
+# Option 1: Employee Data Analysis Project
+def employee_analysis():
+    print("\n--- Employee Data Analysis ---")
+    data = {
+        'EmployeeID': [101, 102, 103, 104, 105],
+        'Name': ['Alice', 'Bob', 'Charlie', 'David', 'Eva'],
+        'Department': ['IT', 'HR', 'IT', 'Finance', 'HR'],
+        'Salary': [75000, 48000, 90000, 60000, 52000]
+    }
+    df = pd.DataFrame(data)
+    print("\nOriginal Dataset:\n", df)
+    
+    avg_salary = df['Salary'].mean()
+    print(f"\nAverage Salary: {avg_salary}")
+    print("\nDepartment Counts:\n", df['Department'].value_counts())
+    
+    filtered_df = df[df['Salary'] > 55000]
+    print("\nEmployees with Salary > 55000:\n", filtered_df)
+    
+    filtered_df.to_csv('filtered_employees.csv', index=False)
+    print("\nExported filtered data to 'filtered_employees.csv'")
+
+# Option 2: COVID-19 Data Tracker
+def covid_tracker():
+    print("\n--- COVID-19 Data Tracker ---")
+    data = {
+        'Country': ['USA', 'India', 'Brazil', 'France', 'Germany'],
+        'Total_Cases': [103000000, 45000000, 37000000, 40000000, 38000000]
+    }
+    df = pd.DataFrame(data)
+    top5 = df.sort_values(by='Total_Cases', ascending=False).head(5)
+    print("Top 5 Countries:\n", top5)
+    
+    plt.figure(figsize=(7, 4))
+    plt.bar(top5['Country'], top5['Total_Cases'], color='skyblue')
+    plt.xlabel('Country')
+    plt.ylabel('Total Cases')
+    plt.title('Top 5 Countries by COVID-19 Cases')
+    plt.show()
+
+# Option 3: Email Automation Tool (Bulk)
+def bulk_email_automation():
+    print("\n--- Bulk Email Automation Tool ---")
+    sender_email = input("Enter sender email: ")
+    sender_password = input("Enter app password: ")
+    
+    students = [
+        {"Name": "Student 1", "Email": "student1@example.com"},
+        {"Name": "Student 2", "Email": "student2@example.com"}
+    ]
+    
+    try:
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        
+        for student in students:
+            msg = MIMEMultipart()
+            msg["From"] = sender_email
+            msg["To"] = student["Email"]
+            msg["Subject"] = f"Hello {student['Name']}"
+            msg.attach(MIMEText(f"Hi {student['Name']},\nThis is an automated update.", "plain"))
+            
+            server.sendmail(sender_email, student["Email"], msg.as_string())
+            print(f"Sent email to {student['Name']}")
+            
+        server.quit()
+    except Exception as e:
+        print(f"Error: {e}")
+
+
+# ==========================================
+# MAIN MENU
+# ==========================================
+
+def main():
+    while True:
+        print("\n==========================================")
+        print("    WEEK 4 - PROJECTS MASTER PROJECT      ")
+        print("==========================================")
+        print("--- Mini Projects ---")
+        print("1. Contact Book App")
+        print("2. Simple Calculator")
+        print("3. Single Email Sender")
+        print("4. Weather App")
+        print("5. Live Crypto Price Fetcher")
+        print("\n--- Capstone Projects ---")
+        print("6. Employee Data Analysis")
+        print("7. COVID-19 Data Tracker")
+        print("8. Bulk Email Automation")
+        print("9. Exit")
+        
+        choice = input("\nEnter your choice (1-9): ")
+        
+        if choice == '1': contact_book()
+        elif choice == '2': calculator()
+        elif choice == '3': send_single_email()
+        elif choice == '4': weather_app()
+        elif choice == '5': crypto_tracker()
+        elif choice == '6': employee_analysis()
+        elif choice == '7': covid_tracker()
+        elif choice == '8': bulk_email_automation()
+        elif choice == '9':
+            print("Exiting Project Suite. Goodbye!")
+            break
+        else:
+            print("Invalid selection. Try again.")
+
+if __name__ == "__main__":
+    main()
